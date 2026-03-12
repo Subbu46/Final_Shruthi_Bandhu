@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+myvenv/
+venv/
+env/
+
+# Model / large files
+*.pt
+*.npy
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/

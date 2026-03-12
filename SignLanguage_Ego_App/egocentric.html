@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egocentric | Shruthi Bandhu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-color: #5d9cec;
+            --text-dark: #434a54;
+            --text-light: #aab2bd;
+            --shadow: 0 10px 20px rgba(0,0,0,0.05);
+            /* RED THEME VARS */
+            --red-bg: #ffebee;
+            --red-border: #ef5350;
+            --red-text: #c62828;
+            --red-accent: #b71c1c;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h1 { margin: 0; font-weight: 600; color: var(--primary-color); }
+
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 30px;
+            width: 95%;
+            max-width: 1200px;
+            padding-bottom: 50px;
+        }
+
+        /* --- LEFT SIDEBAR --- */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: #fff;
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            width: 250px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .label { font-size: 0.8rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; }
+
+        .audio-toggle {
+            display: flex; align-items: center; gap: 10px;
+            background: #f1f1f1; padding: 10px; border-radius: 12px; cursor: pointer;
+        }
+        .status-dot { height: 12px; width: 12px; background-color: #ed5565; border-radius: 50%; }
+
+        select {
+            padding: 12px; border-radius: 12px; border: 1px solid #e6e9ed;
+            font-family: 'Poppins', sans-serif; width: 100%; outline: none;
+        }
+
+        /* --- RIGHT CONTENT --- */
+        .content-wrapper {
+            display: flex; flex-direction: column; gap: 20px;
+            flex-grow: 1; max-width: 800px;
+        }
+
+        .video-card {
+            background: var(--card-bg); padding: 10px; border-radius: 20px;
+            box-shadow: var(--shadow); width: 100%; display: flex; justify-content: center;
+        }
+
+        .video-feed {
+            width: 100%; border-radius: 15px; border: 2px solid #e6e9ed;
+            /* Important: Ensure aspect ratio is handled */
+            max-height: 600px; object-fit: contain;
+        }
+
+        .output-card {
+            background: var(--red-bg); border: 2px solid var(--red-border);
+            border-left: 10px solid var(--red-accent);
+            padding: 25px; border-radius: 20px; box-shadow: var(--shadow); text-align: center;
+        }
+
+        #result-text {
+            font-size: 2rem; font-weight: 600; color: var(--red-accent);
+            min-height: 45px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        <h1>Egocentric Mode</h1>
+    </header>
+
+    <div id="esp-warning" style="
+  background:#ffebee;
+  color:#b71c1c;
+  padding:15px;
+  text-align:center;
+  font-weight:600;
+  display:none;
+">
+⚠️ Please connect to ESP32-S3 WiFi to use Egocentric Mode.
+</div>
+
+
+    <div class="main-container">
+        
+        <div class="controls">
+            <div class="control-group">
+                <div class="label">System Status</div>
+                <div class="audio-toggle" onclick="enableAudio()">
+                    <span class="status-dot" id="audio-status"></span>
+                    <span id="audio-label-text">Enable Audio</span>
+                </div>
+            </div>
+            <hr style="width: 100%; border: 0; border-top: 1px solid #eee;">
+            <div class="control-group">
+                <div class="label">Translation Output</div>
+                <select id="langSelect">
+                    <option value="en">English (Text & Audio)</option>
+                    <option value="hi">Hindi (हिंदी)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <div class="label">Voice Persona</div>
+                <select id="voiceSelect">
+                    <option value="female">Woman (Standard)</option>
+                    <option value="male">Man (Deep)</option>
+                    <option value="child">Child (Fast)</option>
+                    <option value="robot">Robot (Flat)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="video-card">
+                <img
+  id="cameraFeed"
+  class="video-feed"
+  src="/video_feed" 
+  alt="ESP32 Live Camera Feed"
+/>
+
+            </div>
+
+            <div class="output-card">
+                <div class="label" style="color:var(--red-text);">Detected Gesture</div>
+                <div id="result-text">Initializing Model...</div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script>
+  async function checkESPConnection() {
+    try {
+      // Try accessing ESP32 video feed
+      const res = await fetch("/video_feed", { mode: "no-cors" });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  window.addEventListener("load", async () => {
+    const connected = await checkESPConnection();
+    if (!connected) {
+      document.getElementById("esp-warning").style.display = "block";
+    }
+  });
+</script>
+
+
+
+
+    <script>
+        const synth = window.speechSynthesis;
+        let audioEnabled = false;
+        let voices = [];
+        let lastSpoken = "";
+
+        // Load Voices
+        function loadVoices() { voices = synth.getVoices(); }
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        function enableAudio() {
+            audioEnabled = true;
+            document.getElementById('audio-status').style.backgroundColor = '#48cfad';
+            document.getElementById('audio-label-text').innerText = "Audio Active";
+            const u = new SpeechSynthesisUtterance(""); synth.speak(u); // Wake up
+            speak("System Ready", "en");
+        }
+
+        function getVoiceConfig(profile, lang) {
+            let config = { voice: null, pitch: 1, rate: 0.9 };
+            
+            if (lang === 'hi') {
+                const hindiVoice = voices.find(v => v.lang.includes('hi') || v.name.includes('Hindi'));
+                if (hindiVoice) { config.voice = hindiVoice; return config; }
+            }
+
+            const maleVoice = voices.find(v => v.name.includes('David') || v.name.includes('Male'));
+            const femaleVoice = voices.find(v => v.name.includes('Zira') || v.name.includes('Female'));
+
+            if (profile === 'male') { config.voice = maleVoice || voices[0]; config.pitch = 0.9; }
+            else if (profile === 'female') { config.voice = femaleVoice || voices[0]; config.pitch = 1.1; }
+            else if (profile === 'child') { config.voice = femaleVoice || voices[0]; config.pitch = 1.6; config.rate = 1.1; }
+            else if (profile === 'robot') { config.voice = voices[0]; config.pitch = 0.5; }
+
+            return config;
+        }
+
+        function speak(text, lang) {
+            if (!audioEnabled || !text) return;
+            if (synth.speaking) return; 
+
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.lang = (lang === 'hi') ? 'hi-IN' : 'en-US';
+            const profile = document.getElementById('voiceSelect').value;
+            const config = getVoiceConfig(profile, lang);
+
+            if (config.voice) utterThis.voice = config.voice;
+            utterThis.pitch = config.pitch;
+            utterThis.rate = config.rate;
+
+            synth.speak(utterThis);
+        }
+
+        // --- POLL SERVER FOR PREDICTION ---
+        setInterval(() => {
+            fetch('/get_prediction')
+                .then(response => response.json())
+                .then(data => {
+                    const lang = document.getElementById('langSelect').value;
+                    const text = (lang === 'hi') ? data.hindi : data.english;
+                    
+                    if (text !== "Uncertain" && text !== "Initializing..." && text !== "Waiting...") {
+                        document.getElementById('result-text').innerText = text;
+                        
+                        // Only speak if the text has changed
+                        if (text !== lastSpoken) {
+                            speak(text, lang);
+                            lastSpoken = text;
+                        }
+                    } else {
+                        document.getElementById('result-text').innerText = "...";
+                    }
+                })
+                .catch(err => console.error(err));
+        }, 500);
+    </script>
+
+
+
+
+
+</body>
+</html>

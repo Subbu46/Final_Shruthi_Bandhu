@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shruthi Bandhu - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script type="module" src="/js/firebase-config.js"></script>
+  <script type="module" src="/js/auth.js"></script>
+
+  <style>
+    .feature-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    }
+    .welcome-pill {
+      background: white;
+      padding: 10px 25px;
+      border-radius: 50px;
+      border: 1px solid #0d6efd;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+
+<body style="display:none">
+
+<header class="d-flex justify-content-between align-items-center p-3">
+  <div class="d-flex align-items-center">
+    <h1>Shruthi Bandhu</h1>
+  </div>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="learning.html">Learning</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+
+    <span id="auth-nav-item"></span>
+  </nav>
+</header>
+
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height:80vh">
+
+  <div id="user-info" class="welcome-pill" style="display:none">
+    <i class="fas fa-user-check"></i>
+    <span id="welcome-text">Welcome</span>
+  </div>
+
+  <div class="row g-4 justify-content-center w-100">
+    <div class="col-md-4">
+      <div class="feature-card" onclick="enterEgocentric()">
+        <i class="fas fa-glasses fa-3x text-primary mb-3"></i>
+        <h3>Egocentric</h3>
+        <p class="text-muted">Specs view to Speech</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="feature-card" onclick="window.location.href='http://127.0.0.1:5000/'">
+        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+        <h3>Exocentric</h3>
+        <p class="text-muted">Normal view to Speech</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="feature-card" onclick="navigateTo('learning.html')">
+        <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+        <h3>Learning</h3>
+        <p class="text-muted">Learn Gestures</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="snackbar"></div>
+<script src="/js/snackbar.js"></script>
+
+<script>
+  function navigateTo(url) {
+    window.location.href = url;
+  }
+
+  function enterEgocentric() {
+    alert("Egocentric Mode requires ESP32-S3 WiFi.\nPlease connect and continue.");
+    window.location.href = "egocentric.html";
+  }
+</script>
+
+<script type="module">
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { auth } from "/js/firebase-config.js";
+
+  const welcomeText = document.getElementById("welcome-text");
+  const authNav = document.getElementById("auth-nav-item");
+  const userInfo = document.getElementById("user-info");
+
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    document.body.style.display = "block";
+    userInfo.style.display = "block";
+    welcomeText.innerText = `Welcome back, ${user.displayName || user.email}`;
+
+    authNav.innerHTML = `<a href="#" id="logout">Logout</a>`;
+    document.getElementById("logout").onclick = async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    };
+  });
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Page</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <style>
+        .gesture-card { transition: transform 0.3s; cursor: pointer; }
+        .gesture-card:hover { transform: scale(1.05); }
+        .category-tabs { margin-bottom: 20px; }
+        .learning-content { margin-top: 100px; }
+        .badge-icon { font-size: 1.5em; margin-right: 5px; }
+        /* Make video thumbnail fit nicely */
+        .custom-video-thumb {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <header class="d-flex justify-content-between align-items-center p-3">
+        <h1>Gesture Dictionary</h1>
+        <button class="btn btn-secondary" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back</button>
+    </header>
+
+    <div class="container-fluid learning-content">
+        <h2 class="text-center mb-4">Learn Gestures</h2>
+        
+        <div class="text-center mb-3">
+            <h5>Your Badges: <span id="badge-display"></span></h5>
+        </div>
+
+        <input type="text" id="gesture-search" class="form-control mb-3" placeholder="Search gestures..." onkeyup="filterGestures()">
+
+        <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addGestureModal">
+            <i class="fas fa-plus"></i> Add Custom Gesture
+        </button>
+
+        <ul class="nav nav-tabs category-tabs" id="categoryTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#greetings">Greetings</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#essentials">Essentials</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#commands">Commands</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#social">Social</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#custom">Custom</button></li>
+        </ul>
+
+        <div class="tab-content" id="categoryTabsContent">
+            <div class="tab-pane fade show active" id="greetings">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Good Morning', 'Morning Greeting', 'assets/videos/Good Morning.mp4')" data-gesture="Good Morning">
+                            <img src="assets/images/good-morning-thumb.jpg" class="card-img-top" alt="Good Morning" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Good Morning</h5></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Hello', 'Greetings', 'assets/videos/Hello.mp4')" data-gesture="Hello">
+                            <img src="assets/images/hello-thumb.jpg" class="card-img-top" alt="Hello" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Hello</h5></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Namaste', 'Greetings', 'assets/videos/Namaste.mp4')" data-gesture="Namaste">
+                            <img src="assets/images/namaste-thumb.jpg" class="card-img-top" alt="Namaste" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Namaste</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="essentials">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Food', 'I am hungry', 'assets/videos/Food.mp4')" data-gesture="Food">
+                            <img src="assets/images/food-thumb.jpg" class="card-img-top" alt="Food" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Food</h5></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Water', 'I\'m thirsty', 'assets/videos/Water.mp4')" data-gesture="Water">
+                            <img src="assets/images/water-thumb.jpg" class="card-img-top" alt="Water" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Water</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="commands">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Work', 'Let\'s start working', 'assets/videos/Work.mp4')" data-gesture="Work">
+                            <img src="assets/images/work-thumb.jpg" class="card-img-top" alt="Work" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Work</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="social">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card gesture-card" onclick="showModal('Thank You Very Much', 'Expression of gratitude', 'assets/videos/Thank You Very Much.mp4')" data-gesture="Thank You Very Much">
+                            <img src="assets/images/thank-you-thumb.jpg" class="card-img-top" alt="Thank You" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="card-body"><h5>Thank You Very Much</h5></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="custom">
+                <div class="row" id="custom-gestures">
+                    </div>
+                <p id="no-custom-msg" class="text-muted text-center mt-3" style="display:none;">No custom gestures yet. Add one!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="gestureModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5 id="modal-title">Gesture</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body text-center">
+                    <video id="modal-video" controls class="w-100" style="max-height: 300px; background: black;"></video>
+                    <p id="modal-meaning" class="mt-3 fw-bold"></p>
+                    <button class="btn btn-primary" onclick="speakText(document.getElementById('modal-meaning').textContent)">
+                        <i class="fas fa-volume-up"></i> Speak Meaning
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addGestureModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header"><h5>Add Custom Gesture</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="alert alert-info small">Note: Please upload small videos (under 2MB) to ensure they save correctly in your browser.</div>
+                    <input type="text" id="custom-name" class="form-control mb-2" placeholder="Gesture Name">
+                    <input type="text" id="custom-meaning" class="form-control mb-2" placeholder="Meaning">
+                    <input type="file" id="custom-video" class="form-control mb-2" accept="video/*">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="addCustomGesture()">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Shruthi Bandhu. All rights reserved.</p>
+        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // --- 1. Load Data on Start ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBadges();
+            loadCustomGestures();
+        });
+
+        // --- 2. Show Modal (Fixed to handle custom videos) ---
+        function showModal(gesture, meaning, videoSrc) {
+            document.getElementById('modal-title').textContent = gesture;
+            document.getElementById('modal-meaning').textContent = meaning;
+            
+            const videoElement = document.getElementById('modal-video');
+            
+            // Use provided source, or fallback to default path logic if missing
+            if (videoSrc) {
+                videoElement.src = videoSrc;
+            } else {
+                videoElement.src = `assets/videos/${gesture}.mp4`;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('gestureModal'));
+            modal.show();
+            awardBadge(); // Gamification
+        }
+
+        // --- 3. Add Custom Gesture (Fixed for Persistence) ---
+        function addCustomGesture() {
+            const name = document.getElementById('custom-name').value;
+            const meaning = document.getElementById('custom-meaning').value;
+            const videoFile = document.getElementById('custom-video').files[0];
+
+            if (!name || !meaning || !videoFile) {
+                alert('Please fill all fields and upload a video.');
+                return;
+            }
+
+            // Limit file size to 2.5MB to prevent LocalStorage crash
+            if (videoFile.size > 2.5 * 1024 * 1024) {
+                alert("File is too large! Please upload a video smaller than 2.5MB.");
+                return;
+            }
+
+            // Convert video to Base64 String so it stays after refresh
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const videoDataUrl = e.target.result; // This is the persistent string
+
+                const customGestures = JSON.parse(localStorage.getItem('customGestures') || '[]');
+                customGestures.push({ name, meaning, videoSrc: videoDataUrl });
+                localStorage.setItem('customGestures', JSON.stringify(customGestures));
+
+                loadCustomGestures();
+                
+                // Close Modal & Clear Inputs
+                const modalEl = document.getElementById('addGestureModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                document.getElementById('custom-name').value = '';
+                document.getElementById('custom-meaning').value = '';
+                document.getElementById('custom-video').value = '';
+                
+                alert("Gesture added successfully!");
+            };
+            
+            reader.readAsDataURL(videoFile); // Start reading
+        }
+
+        // --- 4. Load Custom Gestures ---
+        function loadCustomGestures() {
+            const customGestures = JSON.parse(localStorage.getItem('customGestures') || '[]');
+            const container = document.getElementById('custom-gestures');
+            const noDataMsg = document.getElementById('no-custom-msg');
+
+            container.innerHTML = '';
+
+            if (customGestures.length === 0) {
+                noDataMsg.style.display = 'block';
+                return;
+            } else {
+                noDataMsg.style.display = 'none';
+            }
+
+            customGestures.forEach((gesture, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 col-sm-6 mb-3';
+                
+                // We create a card that passes the *stored* videoSrc to showModal
+                col.innerHTML = `
+                    <div class="card gesture-card" data-gesture="${gesture.name}">
+                        <video class="custom-video-thumb" src="${gesture.videoSrc}" muted></video>
+                        <div class="card-body">
+                            <h5>${gesture.name}</h5>
+                            <div class="d-flex justify-content-between mt-2">
+                                <button class="btn btn-primary btn-sm" onclick='showModal("${gesture.name.replace(/'/g, "\\'")}", "${gesture.meaning.replace(/'/g, "\\'")}", "${gesture.videoSrc}")'>View</button>
+                                <button class="btn btn-danger btn-sm" onclick="removeCustomGesture(${index})"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // --- 5. Remove Gesture ---
+        function removeCustomGesture(index) {
+            if(!confirm("Are you sure you want to delete this gesture?")) return;
+            
+            const customGestures = JSON.parse(localStorage.getItem('customGestures') || '[]');
+            customGestures.splice(index, 1);
+            localStorage.setItem('customGestures', JSON.stringify(customGestures));
+            loadCustomGestures();
+        }
+
+        // --- 6. Search Filter ---
+        function filterGestures() {
+            const query = document.getElementById('gesture-search').value.toLowerCase();
+            const cards = document.querySelectorAll('.gesture-card');
+            cards.forEach(card => {
+                const gestureName = card.getAttribute('data-gesture').toLowerCase();
+                if (gestureName.includes(query)) {
+                    card.parentElement.style.display = 'block';
+                } else {
+                    card.parentElement.style.display = 'none';
+                }
+            });
+        }
+
+        // --- 7. Gamification ---
+        function awardBadge() {
+            let badges = parseInt(localStorage.getItem('badges') || 0);
+            badges++;
+            localStorage.setItem('badges', badges);
+            loadBadges();
+        }
+
+        function loadBadges() {
+            const badges = parseInt(localStorage.getItem('badges') || 0);
+            const display = document.getElementById('badge-display');
+            let badgeHtml = '';
+            if (badges >= 5) badgeHtml += '<i class="fas fa-trophy badge-icon text-warning"></i> Gesture Master ';
+            if (badges >= 3) badgeHtml += '<i class="fas fa-star badge-icon text-primary"></i> Gesture Learner ';
+            if (badges >= 1) badgeHtml += '<i class="fas fa-medal badge-icon text-secondary"></i> First Step ';
+            display.innerHTML = badgeHtml || 'None yet—start learning!';
+        }
+
+        // --- 8. Speech Synthesis ---
+        function speakText(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
+        }
+    </script>
+
+    <script type="module">
+        import { checkAuth } from "./js/auth.js";
+        
+        console.log("Loading learning.html...");
+        document.body.style.display = "none";
+        const loadingDiv = document.createElement('div');
+        loadingDiv.innerHTML = '<div class="d-flex justify-content-center align-items-center vh-100"><div class="spinner-border text-primary" role="status"><span class="sr-only">Checking authentication...</span></div></div>';
+        document.body.appendChild(loadingDiv);
+        
+        checkAuth().then(() => {
+            if(document.body.contains(loadingDiv)) document.body.removeChild(loadingDiv);
+            document.body.style.display = "block";
+        }).catch((error) => {
+            window.location.href = "login.html";
+        });
+    </script>
+    <div id="snackbar"></div>
+    <script src="js/snackbar.js"></script>
+</body>
+</html>
